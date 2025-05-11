@@ -9,38 +9,94 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Function to update product images based on selected gender
-    function updateProductImages() {
-      var selectedGender = localStorage.getItem('selectedGender') || 'male';
-      document.querySelectorAll('img.motion-reduce[data-gender-male]').forEach(function(img) {
-        var newSrc = selectedGender === 'female'
-          ? img.getAttribute('data-gender-female')
-          : img.getAttribute('data-gender-male');
-        if(newSrc) {
-          // Remove srcset so the new src takes effect
-          img.removeAttribute('srcset');
-          img.src = newSrc;
-        }
-      });
-    }
-    
-    // Check if gender is already selected; if not, show the popup
+    // Show the popup if no gender is selected
     if (!localStorage.getItem('selectedGender')) {
       document.getElementById('gender-popup').style.display = 'block';
-    } else {
-      updateProductImages();
     }
-    
-    // Attach click handlers to the gender buttons
+    // Attach handlers to gender buttons
     document.querySelectorAll('#gender-popup .gender-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var gender = btn.getAttribute('data-gender');
         localStorage.setItem('selectedGender', gender);
         document.getElementById('gender-popup').style.display = 'none';
-        // Update images immediately after gender is selected
-        updateProductImages();
+        // Update gender gallery items immediately
+        document.querySelectorAll('.gender-image-item').forEach(function(item) {
+          item.style.display = (item.getAttribute('data-gender') === gender) ? 'block' : 'none';
+        });
+        // Update product card images without refresh
+        if(window.updateProductCardImages) {
+          window.updateProductCardImages();
+        }
+        // Update motion-reduce images without refresh
+        document.querySelectorAll('img.motion-reduce[data-gender-male]').forEach(function(img) {
+          var newSrc = gender === 'female' 
+            ? img.getAttribute('data-gender-female') 
+            : img.getAttribute('data-gender-male');
+          if(newSrc) {
+            img.removeAttribute('srcset');
+            img.src = newSrc;
+          }
+        });
       });
     });
+  });
+
+  (function() {
+    const GENDER_KEY = 'selectedGender';
+    
+    function getGender() {
+      // Removed default fallback to 'male'
+      return localStorage.getItem(GENDER_KEY);
+    }
+    
+    function updateProductCardImages() {
+      const gender = getGender();
+      if(gender){
+        document.querySelectorAll('.card__image').forEach((img) => {
+          const newSrc = img.dataset[`gender${gender.charAt(0).toUpperCase() + gender.slice(1)}`];
+          if(newSrc) {
+            img.src = newSrc;
+          }
+        });
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function(){
+      updateProductCardImages();
+    });
+    
+    window.updateProductCardImages = updateProductCardImages;
+  })();
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var selectedGender = localStorage.getItem('selectedGender');
+    // Only update if a gender is selected
+    if(selectedGender){
+      document.querySelectorAll('img.motion-reduce[data-gender-male]').forEach(function(img) {
+        var newSrc = selectedGender === 'female' 
+          ? img.getAttribute('data-gender-female') 
+          : img.getAttribute('data-gender-male');
+        if(newSrc) {
+          img.removeAttribute('srcset');
+          img.src = newSrc;
+        }
+      });
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var selectedGender = localStorage.getItem('selectedGender');
+    var genderItems = document.querySelectorAll('.gender-image-item');
+    if (selectedGender) {
+      genderItems.forEach(function(item) {
+        item.style.display = (item.getAttribute('data-gender') === selectedGender) ? 'block' : 'none';
+      });
+    } else {
+      // If no gender is selected, show both gallery items (default)
+      genderItems.forEach(function(item) {
+        item.style.display = 'block';
+      });
+    }
   });
 </script>
 
