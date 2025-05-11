@@ -80,6 +80,8 @@
                 {% endunless %}
                 width="{{ card_product.featured_media.width }}"
                 height="{{ card_product.featured_media.height }}"
+                data-gender-male="{{ card_product.metafields.custom.gender_image_male }}"
+                data-gender-female="{{ card_product.metafields.custom.gender_image_female }}"
               >
               {% comment %}theme-check-enable ImgLazyLoading{% endcomment %}
 

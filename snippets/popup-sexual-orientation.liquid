@@ -21,6 +21,45 @@
       });
     });
   });
+
+  (function() {
+    const GENDER_KEY = 'selectedGender';
+    
+    function getGender() {
+      return localStorage.getItem(GENDER_KEY) || 'male';
+    }
+    
+    function updateProductCardImages() {
+      const gender = getGender();
+      document.querySelectorAll('.card__image').forEach((img) => {
+        const newSrc = img.dataset[`gender${gender.charAt(0).toUpperCase() + gender.slice(1)}`];
+        if(newSrc) {
+           img.src = newSrc;
+        }
+      });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function(){
+      updateProductCardImages();
+    });
+    
+    // Expose the function if needed elsewhere.
+    window.updateProductCardImages = updateProductCardImages;
+  })();
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var selectedGender = localStorage.getItem('selectedGender') || 'male';
+    document.querySelectorAll('img.motion-reduce[data-gender-male]').forEach(function(img) {
+      var newSrc = selectedGender === 'female' 
+        ? img.getAttribute('data-gender-female') 
+        : img.getAttribute('data-gender-male');
+      if(newSrc) {
+        // Remove srcset so the new src is used
+        img.removeAttribute('srcset');
+        img.src = newSrc;
+      }
+    });
+  });
 </script>
 
 
